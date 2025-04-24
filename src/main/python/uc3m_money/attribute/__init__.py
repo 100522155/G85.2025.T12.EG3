@@ -1,8 +1,11 @@
+"""Docstring"""
 import re
-from uc3m_money.exception.account_management_exception import AccountManagementException
 from datetime import datetime, timezone
+from uc3m_money.exception.account_management_exception import AccountManagementException
+
 
 class Attribute:
+    """fijar atributos"""
     def __init__(self):
         self._attr_value = ""
         self._error_message = ""
@@ -28,6 +31,7 @@ class Attribute:
 
 
 class CONCEPT(Attribute):
+    """"""
     def __init__(self, attr_value):
         super().__init__()
         self._error_message = "Invalid concept format"
@@ -127,6 +131,3 @@ class DEPOSIT(Attribute):
         deposit_amount_valid = float(deposit_amount[4:])
         if deposit_amount_valid == 0:
             raise AccountManagementException("Error - Deposit must be greater than 0")
-
-
-

@@ -91,3 +91,15 @@ try:
 except KeyError as e:
     raise AccountManagementException("Error - Invalid Key in JSON") from e
 """
+"""
+    def __new__(cls):
+        if not AccountManager.instance:
+            AccountManager.instance = AccountManager.__AccountManager()
+        return AccountManager.instance
+
+    def __getattr__(self, item):
+        return getattr(AccountManager.instance, item)
+
+    def __setattr__(self, key, value):
+        return setattr(AccountManager.instance, key, value)
+"""

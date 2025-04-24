@@ -4,7 +4,6 @@ from uc3m_money.data.transfer_request import TransferRequest
 from uc3m_money.account_manager import AccountManager
 from uc3m_money.exception.account_management_exception import AccountManagementException
 from uc3m_money.data.account_deposit import AccountDeposit
-from uc3m_money.storage.transfer_json_store import TransferJsonStore
 from uc3m_money.config.account_management_config import (JSON_FILES_PATH,
                                                          JSON_FILES_DEPOSITS,
                                                          TRANSFERS_STORE_FILE,

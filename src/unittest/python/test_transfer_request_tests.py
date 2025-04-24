@@ -116,12 +116,14 @@ class TestTransferRequestTest(TestCase):
     @freeze_time("2025/03/22 13:00:00")
     def test_duplicated_transfer_test(self):
         """tets methdo for duplicated transfer"""
-        iban_from = "ES6211110783482828975098"
+        #iban_from = "ES6211110783482828975098"
         # From_iban;to_iban;concept;type;date;amount;RESULT
-        iban_to = "ES8658342044541216872704"
+        #iban_to = "ES8658342044541216872704"
+        iban_from = "ES6211110783482828975098"  # IBAN válido
+        iban_to = "ES6621000418401234567891"  # IBAN válido
         transfer_type = "ORDINARY"
         transfer_amount = 10.0
-        transfer_date = "22/03/2025"
+        transfer_date = "26/04/2025"
         transfer_concept = "Testing duplicated transfers"
         mngr  = AccountManager()
         mngr.transfer_request(from_iban=iban_from,

@@ -1,3 +1,4 @@
+"""
 from uc3m_money import TRANSFERS_STORE_FILE, AccountManagementException
 
 
@@ -24,4 +25,5 @@ class TransferJsonStore():
 
     def __setattr__(self, key, value):
         return setattr(TransferJsonStore.instance, key, value)
+        """
 

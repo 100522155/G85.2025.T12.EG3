@@ -1,5 +1,6 @@
 """Account manager module """
 import json
+import os
 from datetime import datetime, timezone
 
 from uc3m_money.exception.account_management_exception import AccountManagementException
@@ -20,7 +21,12 @@ class AccountManager:
         """first method: receives transfer info and
         stores it into a file"""
 
-        my_request = TransferRequest(from_iban,to_iban,concept,transfer_type,date,amount)
+        my_request = TransferRequest(from_iban=from_iban,
+                                     to_iban=to_iban,
+                                     transfer_concept=concept,
+                                     transfer_type=transfer_type,
+                                     transfer_date=date,
+                                     transfer_amount=amount)
 
         transfer_list = self.read_input_file(TRANSFERS_STORE_FILE)
         for transfer_item in transfer_list:
@@ -85,6 +91,7 @@ class AccountManager:
         """Lee un archivo JSON y devuelve su contenido como lista.
         Si el archivo no existe, devuelve una lista vacía."""
         try:
+            input_file = os.path.abspath(input_file)
             with open(input_file, "r", encoding="utf-8", newline="") as file:
                 return json.load(file)
         except FileNotFoundError:
@@ -98,19 +105,9 @@ class AccountManager:
     def write_input_file(input_file: str, data: list) -> None:
         """Escribe datos en un archivo JSON. Maneja errores de escritura."""
         try:
+            input_file = os.path.abspath(input_file)
             with open(input_file, "w", encoding="utf-8", newline="") as file:
                 json.dump(data, file, indent=2)
         except (OSError, json.JSONDecodeError) as ex:
             raise AccountManagementException("Wrong file or file path or JSON decode error") from ex
 
-
-    def __new__(cls):
-        if not AccountManager.instance:
-            AccountManager.instance = AccountManager.__AccountManager()
-        return AccountManager.instance
-
-    def __getattr__(self, item):
-        return getattr(AccountManager.instance, item)
-
-    def __setattr__(self, key, value):
-        return setattr(AccountManager.instance, key, value)
