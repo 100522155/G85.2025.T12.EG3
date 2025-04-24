@@ -2,6 +2,7 @@
 import hashlib
 import json
 from datetime import datetime, timezone
+from uc3m_money.attribute import IBAN, CONCEPT, DATE, FORMAT, TRANSFER, DEPOSIT  # Nuevas clases
 
 class TransferRequest:
     """Class representing a transfer request"""
@@ -13,14 +14,15 @@ class TransferRequest:
                  transfer_concept:str,
                  transfer_date:str,
                  transfer_amount:float):
-        self.__from_iban = from_iban
-        self.__to_iban = to_iban
-        self.__transfer_type = transfer_type
-        self.__concept = transfer_concept
-        self.__transfer_date = transfer_date
-        self.__transfer_amount = transfer_amount
+        self.__from_iban = IBAN(from_iban).value
+        self.__to_iban = IBAN(to_iban).value
+        self.__transfer_type = FORMAT(transfer_type).value
+        self.__concept = CONCEPT(transfer_concept).value
+        self.__transfer_date = DATE(transfer_date).value
+        self.__transfer_amount = TRANSFER(transfer_amount)
         justnow = datetime.now(timezone.utc)
         self.__time_stamp = datetime.timestamp(justnow)
+
 
     def __str__(self):
         return "Transfer:" + json.dumps(self.__dict__)
@@ -96,3 +98,6 @@ class TransferRequest:
     def transfer_code(self):
         """Returns the md5 signature (transfer code)"""
         return hashlib.md5(str(self).encode()).hexdigest()
+
+
+

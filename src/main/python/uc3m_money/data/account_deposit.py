@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 import hashlib
 
+
 class AccountDeposit():
     """Class representing the information required for shipping of an order"""
 
@@ -60,3 +61,11 @@ class AccountDeposit():
     def deposit_signature( self ):
         """Returns the sha256 signature of the date"""
         return hashlib.sha256(self.__signature_string().encode()).hexdigest()
+
+    @classmethod
+    def get_deposit_from_file(cls, file_name):
+        try:
+            deposit_iban = deposit_file["IBAN"]
+            deposit_amount = deposit_file["AMOUNT"]
+        except KeyError as e:
+            raise AccountManagementException("Error - Invalid Key in JSON") from e

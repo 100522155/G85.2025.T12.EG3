@@ -1,5 +1,5 @@
 import re
-from uc3m_money.account_management_exception import AccountManagementException
+from uc3m_money.exception.account_management_exception import AccountManagementException
 from datetime import datetime, timezone
 
 class Attribute:
@@ -82,7 +82,6 @@ class BALANCE(Attribute):
             raise AccountManagementException("IBAN not found")
 
 
-
 class DATE(Attribute):
     def __init__(self, attr_value):
         super().__init__()
@@ -122,18 +121,12 @@ class DEPOSIT(Attribute):
         self._error_message = "Invalid cuantity format"
         self._validation_pattern = r"^EUR [0-9]{4}\.[0-9]{2}"
         self.value = attr_value  # Esto activará la validación
-    def _validate(self,deposit_file):
-        try:
-            deposit_iban = deposit_file["IBAN"]
-            deposit_amount = deposit_file["AMOUNT"]
+    def _validate(self,deposit_amount):
 
-            super()._validate(deposit_amount)
-            IBAN(deposit_iban)
+        super()._validate(deposit_amount)
+        deposit_amount_valid = float(deposit_amount[4:])
+        if deposit_amount_valid == 0:
+            raise AccountManagementException("Error - Deposit must be greater than 0")
 
-            deposit_amount_valid = float(deposit_amount[4:])
-            if deposit_amount_valid == 0:
-                raise AccountManagementException("Error - Deposit must be greater than 0")
 
-            return  deposit_iban, deposit_amount
-        except KeyError as e:
-            raise AccountManagementException("Error - Invalid Key in JSON") from e
+
