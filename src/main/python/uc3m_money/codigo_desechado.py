@@ -30,3 +30,48 @@ def valivan(self, iban: str):
         raise AccountManagementException("Invalid IBAN control digit")
     return iban
 """
+"""
+def validate_concept(self, concept: str):
+    #regular expression for checking the minimum and maximum length as well as
+    the allowed characters and spaces restrictions
+    there are other ways to check this
+    Concept(concept)
+"""
+
+"""
+def validate_transfer_date(self, transfer_date):
+    #validates the arrival date format  using regex
+    DATE(transfer_date)
+
+    try:
+        my_date = datetime.strptime(transfer_date, "%d/%m/%Y").date()
+    except ValueError as ex:
+        raise AccountManagementException("Invalid date format") from ex
+
+    if my_date < datetime.now(timezone.utc).date():
+        raise AccountManagementException("Transfer date must be today or later.")
+
+    if my_date.year < 2025 or my_date.year > 2050:
+        raise AccountManagementException("Invalid date format")
+    return transfer_date
+"""
+
+"""        try:
+            float_amount  = float(amount)
+        except ValueError as exc:
+            raise AccountManagementException("Invalid transfer amount") from exc
+
+        string_amount = str(float_amount)
+        if '.' in string_amount:
+            decimales = len(string_amount.split('.')[1])
+            if decimales > 2:
+                raise AccountManagementException("Invalid transfer amount")
+
+        if float_amount < 10 or float_amount > 10000:
+            raise AccountManagementException("Invalid transfer amount")
+"""
+
+"""    def check_format(self, to_verify, regex):
+        result = regex.fullmatch(to_verify)
+        if not result:
+            raise AccountManagementException("Error - Invalid format")"""

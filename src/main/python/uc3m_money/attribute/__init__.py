@@ -1,8 +1,8 @@
 import re
 from uc3m_money.account_management_exception import AccountManagementException
+from datetime import datetime, timezone
 
-
-class Attribute():
+class Attribute:
     def __init__(self):
         self._attr_value = ""
         self._error_message = ""
@@ -34,7 +34,6 @@ class Concept(Attribute):
         self._validation_pattern = r"^(?=^.{10,30}$)([a-zA-Z]+(\s[a-zA-Z]+)+$"
         self.value = attr_value
 
-
 class IBAN(Attribute):
     def __init__(self, attr_value):
         super().__init__()
@@ -46,16 +45,12 @@ class IBAN(Attribute):
         """Method for validating an IBAN including control digit check"""
         # Primero validar el formato básico con el patrón regex
         super()._validate(iban)
-
         # Validación del dígito de control
         original_code = iban[2:4]
-
         # Reemplazar el código de control por 00 para el cálculo
         iban = iban[:2] + "00" + iban[4:]
-
         # Mover los primeros 4 caracteres al final
         iban = iban[4:] + iban[:4]
-
         # Crear tabla de traducción de letras a números
         translation_table = str.maketrans({
             'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15',
@@ -64,22 +59,67 @@ class IBAN(Attribute):
             'S': '28', 'T': '29', 'U': '30', 'V': '31', 'W': '32', 'X': '33',
             'Y': '34', 'Z': '35'
         })
-
         # Aplicar traducción
         iban_numeric = iban.translate(translation_table)
-
         # Calcular dígito de control (98 - (mod 97))
         calculated_code = 98 - (int(iban_numeric) % 97)
-
         # Comprobar que coincide con el código original
         if int(original_code) != calculated_code:
             raise AccountManagementException("Invalid IBAN control digit")
 
         return iban
-    class TRANSFER_DATE(Attribute):
-        def __init__(self, attr_value):
-            super().__init__()
-            self._error_message = "Invalid date format"
-            self._validation_pattern = r"^(([0-2]\d|3[0-1])\/(0\d|1[0-2])\/\d\d\d\d)$"
-            self.value = attr_value  # Esto activará la validación
 
+class DATE(Attribute):
+    def __init__(self, attr_value):
+        super().__init__()
+        self._error_message = "Invalid date format"
+        self._validation_pattern = r"^(([0-2]\d|3[0-1])\/(0\d|1[0-2])\/\d\d\d\d)$"
+        self.value = attr_value  # Esto activará la validación
+
+    def _validate(self, transfer_date):
+        super()._validate(transfer_date)
+
+        try:
+            my_date = datetime.strptime(transfer_date, "%d/%m/%Y").date()
+            if not (2025 <= my_date.year <= 2050):
+                raise AccountManagementException("Year must be between 2025-2050")
+            if my_date < datetime.now(timezone.utc).date():
+                raise AccountManagementException("Transfer date must be today or later")
+        except ValueError:
+            raise AccountManagementException("Invalid calendar date")
+
+class FORMAT(Attribute):
+    def __init__(self, attr_value):
+        super().__init__()
+        self._error_message = "Invalid operation format"
+        self._validation_pattern = r"(ORDINARY|INMEDIATE|URGENT)"
+        self.value = attr_value  # Esto activará la validación
+
+class TRANSFER(Attribute):
+    def __init__(self, attr_value):
+        super().__init__()
+        self._error_message = "Invalid cuantity format"
+        self._validation_pattern = r"^(10|1[1-9]|[2-9]\d|[1-9]\d{2,3}|10000)(\.\d{1,2})?$"
+        self.value = attr_value  # Esto activará la validación
+
+class DEPOSIT(Attribute):
+    def __init__(self, attr_value):
+        super().__init__()
+        self._error_message = "Invalid cuantity format"
+        self._validation_pattern = r"^EUR [0-9]{4}\.[0-9]{2}"
+        self.value = attr_value  # Esto activará la validación
+    def _validate(self,deposit_file):
+        try:
+            deposit_iban = deposit_file["IBAN"]
+            deposit_amount = deposit_file["AMOUNT"]
+
+            super()._validate(deposit_amount)
+            IBAN(deposit_iban)
+
+            deposit_amount_valid = float(deposit_amount[4:])
+            if deposit_amount_valid == 0:
+                raise AccountManagementException("Error - Deposit must be greater than 0")
+
+            return  deposit_iban, deposit_amount
+        except KeyError as e:
+            raise AccountManagementException("Error - Invalid Key in JSON") from e
