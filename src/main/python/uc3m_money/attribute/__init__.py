@@ -27,7 +27,7 @@ class Attribute:
         self._attr_value = self._validate(attr_value)
 
 
-class Concept(Attribute):
+class CONCEPT(Attribute):
     def __init__(self, attr_value):
         super().__init__()
         self._error_message = "Invalid concept format"
@@ -68,6 +68,20 @@ class IBAN(Attribute):
             raise AccountManagementException("Invalid IBAN control digit")
 
         return iban
+
+class BALANCE(Attribute):
+    def _validate(self, iban: str, transactions_list ):
+        iban_found = False
+        total_balance = 0
+        for transaction in transactions_list:
+            # print(transaction["IBAN"] + " - " + iban)
+            if transaction["IBAN"] == iban:
+                total_balance += float(transaction["amount"])
+                iban_found = True
+        if not iban_found:
+            raise AccountManagementException("IBAN not found")
+
+
 
 class DATE(Attribute):
     def __init__(self, attr_value):

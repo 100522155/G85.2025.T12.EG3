@@ -6,10 +6,9 @@ from wsgiref.validate import validator
 from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,DEPOSITS_STORE_FILE,
                                         TRANSACTIONS_STORE_FILE,BALANCES_STORE_FILE)
-
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
-from uc3m_money.attribute import IBAN, Concept, DATE, FORMAT, TRANSFER, DEPOSIT  # Nuevas clases
+from uc3m_money.attribute import IBAN, CONCEPT, DATE, FORMAT, TRANSFER, DEPOSIT  # Nuevas clases
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
@@ -23,7 +22,7 @@ class AccountManager:
         stores it into a file"""
         IBAN(from_iban)
         IBAN(to_iban)
-        Concept(concept)
+        CONCEPT(concept)
         FORMAT(transfer_type)
         DATE(date)
         TRANSFER(amount)
