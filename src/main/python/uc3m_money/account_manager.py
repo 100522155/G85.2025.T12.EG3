@@ -3,8 +3,8 @@ import json
 from datetime import datetime, timezone
 
 from uc3m_money.exception.account_management_exception import AccountManagementException
-from uc3m_money.config.account_management_config import (TRANSFERS_STORE_FILE, DEPOSITS_STORE_FILE,
-                                                         TRANSACTIONS_STORE_FILE, BALANCES_STORE_FILE)
+from uc3m_money.config.account_management_config import (
+    TRANSFERS_STORE_FILE, DEPOSITS_STORE_FILE, TRANSACTIONS_STORE_FILE, BALANCES_STORE_FILE)
 from uc3m_money.data.transfer_request import TransferRequest
 from uc3m_money.data.account_deposit import AccountDeposit
 from uc3m_money.attribute import IBAN, CONCEPT, DATE, FORMAT, TRANSFER, DEPOSIT  # Nuevas clases
@@ -89,7 +89,7 @@ class AccountManager:
                 return json.load(file)
         except FileNotFoundError:
             if raise_if_missing:
-                raise AccountManagementException("Wrong file or file path")
+                raise AccountManagementException('Wrong file or file path')
             return []
         except json.JSONDecodeError as ex:
             raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex

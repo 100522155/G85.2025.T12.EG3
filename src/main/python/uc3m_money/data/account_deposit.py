@@ -64,6 +64,7 @@ class AccountDeposit():
 
     @classmethod
     def get_deposit_from_file(cls, file_name):
+        """gets the deposit"""
         try:
             deposit_iban = deposit_file["IBAN"]
             deposit_amount = deposit_file["AMOUNT"]
