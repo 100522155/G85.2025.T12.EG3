@@ -51,8 +51,8 @@ class AccountManager:
         except KeyError as e:
             raise AccountManagementException("Error - Invalid Key in JSON") from e
 
-        DEPOSIT(deposit_amount)
         IBAN(deposit_iban)
+        DEPOSIT(deposit_amount)
         # comprobar valores del fichero
 
         deposit_obj = AccountDeposit(deposit_iban,deposit_amount) # quitadas especif innecesarias

@@ -35,7 +35,7 @@ class CONCEPT(Attribute):
     def __init__(self, attr_value):
         super().__init__()
         self._error_message = "Invalid concept format"
-        self._validation_pattern = r"^(?=^.{10,30}$)([a-zA-Z]+(\s[a-zA-Z]+)+$"
+        self._validation_pattern = r"^(?=^.{10,30}$)([a-zA-Z])+(\s[a-zA-Z]+)+$"
         self.value = attr_value
 
 class IBAN(Attribute):
@@ -93,36 +93,43 @@ class DATE(Attribute):
         self._validation_pattern = r"^(([0-2]\d|3[0-1])\/(0\d|1[0-2])\/\d\d\d\d)$"
         self.value = attr_value  # Esto activará la validación
 
+
     def _validate(self, transfer_date):
         super()._validate(transfer_date)
 
         try:
             my_date = datetime.strptime(transfer_date, "%d/%m/%Y").date()
             if not (2025 <= my_date.year <= 2050):
-                raise AccountManagementException("Year must be between 2025-2050")
+                raise AccountManagementException("Invalid date format")
             if my_date < datetime.now(timezone.utc).date():
-                raise AccountManagementException("Transfer date must be today or later")
+                raise AccountManagementException("Transfer date must be today or later.")
         except ValueError:
-            raise AccountManagementException("Invalid calendar date")
+            raise AccountManagementException("Invalid date format")
 
 class FORMAT(Attribute):
     def __init__(self, attr_value):
         super().__init__()
-        self._error_message = "Invalid operation format"
+        self._error_message = "Invalid transfer type"
         self._validation_pattern = r"(ORDINARY|INMEDIATE|URGENT)"
         self.value = attr_value  # Esto activará la validación
 
 class TRANSFER(Attribute):
     def __init__(self, attr_value):
         super().__init__()
-        self._error_message = "Invalid cuantity format"
+        self._error_message = "Invalid transfer amount"
         self._validation_pattern = r"^(10|1[1-9]|[2-9]\d|[1-9]\d{2,3}|10000)(\.\d{1,2})?$"
         self.value = attr_value  # Esto activará la validación
+
+    def _validate(self, value):
+        # Convertir a string si es un float/int
+        if isinstance(value, (float, int)):
+            value = str(value)
+        return super()._validate(value)  # Ahora value es string y el regex funciona
 
 class DEPOSIT(Attribute):
     def __init__(self, attr_value):
         super().__init__()
-        self._error_message = "Invalid cuantity format"
+        self._error_message = "Error - Invalid deposit amount"
         self._validation_pattern = r"^EUR [0-9]{4}\.[0-9]{2}"
         self.value = attr_value  # Esto activará la validación
     def _validate(self,deposit_amount):

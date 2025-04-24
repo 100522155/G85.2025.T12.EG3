@@ -19,7 +19,7 @@ class TransferRequest:
         self.__transfer_type = FORMAT(transfer_type).value
         self.__concept = CONCEPT(transfer_concept).value
         self.__transfer_date = DATE(transfer_date).value
-        self.__transfer_amount = TRANSFER(transfer_amount)
+        self.__transfer_amount = TRANSFER(transfer_amount).value
         justnow = datetime.now(timezone.utc)
         self.__time_stamp = datetime.timestamp(justnow)
 
