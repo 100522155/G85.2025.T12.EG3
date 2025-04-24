@@ -2,13 +2,13 @@ import re
 from uc3m_money.account_management_exception import AccountManagementException
 
 
-class Attribute:
+class Attribute():
     def __init__(self):
         self._attr_value = ""
         self._error_message = ""
         self._validation_pattern = r""
 
-    def _validate(self, value):
+    def _validate(self, value: str):
         """Validates the value against the validation pattern"""
         myregex = re.compile(self._validation_pattern)
         res = myregex.fullmatch(value)
@@ -42,13 +42,12 @@ class IBAN(Attribute):
         self._validation_pattern = r"^ES[0-9]{22}$"
         self.value = attr_value  # Esto activará la validación
 
-    def _validate(self, attr_value: str) -> str:
+    def _validate(self, iban: str) -> str:
         """Method for validating an IBAN including control digit check"""
         # Primero validar el formato básico con el patrón regex
-        super()._validate(attr_value)
+        super()._validate(iban)
 
         # Validación del dígito de control
-        iban = attr_value
         original_code = iban[2:4]
 
         # Reemplazar el código de control por 00 para el cálculo
@@ -76,4 +75,11 @@ class IBAN(Attribute):
         if int(original_code) != calculated_code:
             raise AccountManagementException("Invalid IBAN control digit")
 
-        return attr_value
+        return iban
+    class TRANSFER_DATE(Attribute):
+        def __init__(self, attr_value):
+            super().__init__()
+            self._error_message = "Invalid date format"
+            self._validation_pattern = r"^(([0-2]\d|3[0-1])\/(0\d|1[0-2])\/\d\d\d\d)$"
+            self.value = attr_value  # Esto activará la validación
+

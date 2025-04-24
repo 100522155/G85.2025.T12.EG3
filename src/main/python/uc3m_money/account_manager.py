@@ -2,6 +2,8 @@
 import re
 import json
 from datetime import datetime, timezone
+from wsgiref.validate import validator
+
 from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
                                         DEPOSITS_STORE_FILE,
@@ -10,48 +12,31 @@ from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
+from uc3m_money.attribute import Attribute, IBAN, Concept  # Nuevas clases
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
+
     def __init__(self):
         pass
 
-    def valivan(self, iban: str):
-        """
-    Calcula el dígito de control de un IBAN español.
-        """
-        self.check_format(iban, re.compile(r"^ES[0-9]{22}"))
-        original_code = iban[2:4]
-        #replacing the control
-        iban = iban[:2] + "00" + iban[4:]
-        iban = iban[4:] + iban[:4]
 
-        # Crear tabla de traducción
-        translation_table = str.maketrans({
-            'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15',
-            'G': '16', 'H': '17', 'I': '18', 'J': '19', 'K': '20', 'L': '21',
-            'M': '22', 'N': '23', 'O': '24', 'P': '25', 'Q': '26', 'R': '27',
-            'S': '28', 'T': '29', 'U': '30', 'V': '31', 'W': '32', 'X': '33',
-            'Y': '34', 'Z': '35'
-        })
-
-        # Aplicar traducción en una sola operación
-        iban = iban.translate(translation_table)
-
-        #Calcular el dígito de control: cadena a número entero, sacar módulo 97 y calcular dígito de control
-        if int(original_code) != 98 - int(iban) % 97:
-            raise AccountManagementException("Invalid IBAN control digit")
-        return iban
-
-    @staticmethod
-    def check_format(to_verify, regex):
+    def check_format(self, to_verify, regex):
         result = regex.fullmatch(to_verify)
         if not result:
             raise AccountManagementException("Error - Invalid format")
 
-    def validate_transfer_date(self, transfer_date):
 
-        self.check_format(transfer_date,re.compile(r"^(([0-2]\d|3[0-1])(0\d|1[0-2])\d\d\d\d)$"))
+    def validate_concept(self, concept: str):
+        """regular expression for checking the minimum and maximum length as well as
+        the allowed characters and spaces restrictions
+        there are other ways to check this"""
+        Concept(concept)
+
+    def validate_transfer_date(self, transfer_date):
+        """validates the arrival date format  using regex"""
+        myregex = re.compile(r"^(([0-2]\d|3[0-1])\/(0\d|1[0-2])\/\d\d\d\d)$")
+        self.check_format(transfer_date,myregex)
 
         try:
             my_date = datetime.strptime(transfer_date, "%d/%m/%Y").date()
@@ -73,10 +58,14 @@ class AccountManager:
                          amount: float)->str:
         """first method: receives transfer info and
         stores it into a file"""
-        self.valivan(from_iban)
-        self.valivan(to_iban)
-        self.check_format(concept, re.compile(r"^(?=^.{10,30}$)([a-zA-Z]+(\s[a-zA-Z]+)+)$"))
-        self.check_format(transfer_type, re.compile(r"(ORDINARY|INMEDIATE|URGENT)")) #chequear formato adecuado
+        IBAN(from_iban)
+        IBAN(to_iban)
+        #self.valivan(from_iban)
+        #self.valivan(to_iban)
+        self.validate_concept(concept)
+        myregex = re.compile(r"(ORDINARY|INMEDIATE|URGENT)")
+
+        self.check_format(transfer_type, myregex) #chequear formato adecuado
         self.validate_transfer_date(date)
 
         try:
@@ -118,7 +107,7 @@ class AccountManager:
 
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""
-        deposit_file = self.load_json_store(input_file, raise_if_missing=True)
+        deposit_file = self.load_json_store(input_file, raise_if_missing= True )
 
         # comprobar valores del fichero
         try:
@@ -126,10 +115,11 @@ class AccountManager:
             deposit_amount = deposit_file["AMOUNT"]
         except KeyError as e:
             raise AccountManagementException("Error - Invalid Key in JSON") from e
+        IBAN(deposit_iban)
+        #deposit_iban = self.valivan(deposit_iban)
+        myregex = re.compile(r"^EUR [0-9]{4}\.[0-9]{2}")
 
-        deposit_iban = self.valivan(deposit_iban)
-
-        self.check_format(deposit_amount, re.compile(r"^EUR [0-9]{4}\.[0-9]{2}"))
+        self.check_format(deposit_amount, myregex)
 
         deposit_amount_valid = float(deposit_amount[4:])
         if deposit_amount_valid == 0:
@@ -146,11 +136,12 @@ class AccountManager:
 
     def calculate_balance(self, iban:str)->bool:
         """calculate the balance for a given iban"""
-        iban = self.valivan(iban)
-        transactions_list = self.manage_read_file(TRANSACTIONS_STORE_FILE)
+        IBAN(iban)
+        transactions_list = self.load_json_store(file_path, raise_if_missing=True)
         iban_found = False
         total_balance = 0
         for transaction in transactions_list:
+            #print(transaction["IBAN"] + " - " + iban)
             if transaction["IBAN"] == iban:
                 total_balance += float(transaction["amount"])
                 iban_found = True
@@ -165,13 +156,12 @@ class AccountManager:
         balance_list.append(last_balance)
         self._write_json_file(BALANCES_STORE_FILE,balance_list)
         return True
-
     @staticmethod
-    def load_json_store(file_path, raise_if_missing: bool = False ) ->list :
+    def load_json_store(file_store, raise_if_missing: bool = False  ) -> list :
         """Lee un archivo JSON y devuelve su contenido como lista.
         Si el archivo no existe, devuelve una lista vacía."""
         try:
-            with open(file_path, "r", encoding="utf-8", newline="") as file:
+            with open(file_store, "r", encoding="utf-8", newline="") as file:
                 return json.load(file)
         except FileNotFoundError:
             if raise_if_missing:
@@ -186,5 +176,5 @@ class AccountManager:
         try:
             with open(file_path, "w", encoding="utf-8", newline="") as file:
                 json.dump(data, file, indent=2)
-        except (OSError, json.JSONDecodeError) as ex:
+        except (FileNotFoundError, IOError, json.JSONDecodeError) as ex:
             raise AccountManagementException("Wrong file or file path or JSON decode error") from ex
