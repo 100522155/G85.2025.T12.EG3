@@ -7,7 +7,7 @@ from uc3m_money.config.account_management_config import (
     TRANSFERS_STORE_FILE, DEPOSITS_STORE_FILE, TRANSACTIONS_STORE_FILE, BALANCES_STORE_FILE)
 from uc3m_money.data.transfer_request import TransferRequest
 from uc3m_money.data.account_deposit import AccountDeposit
-from uc3m_money.attribute import IBAN, CONCEPT, DATE, FORMAT, TRANSFER, DEPOSIT  # Nuevas clases
+from uc3m_money.attribute import IBAN, DEPOSIT  # Nuevas clases
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
