@@ -1,25 +1,34 @@
 """Account manager module """
-import json
+import re
 import os
+import json
 from datetime import datetime, timezone
+from uc3m_money.account_management_exception import AccountManagementException
+from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
+                                        DEPOSITS_STORE_FILE,
+                                        TRANSACTIONS_STORE_FILE,
+                                        BALANCES_STORE_FILE)
 
-from uc3m_money.exception.account_management_exception import AccountManagementException
-from uc3m_money.config.account_management_config import (
-    TRANSFERS_STORE_FILE, DEPOSITS_STORE_FILE, TRANSACTIONS_STORE_FILE, BALANCES_STORE_FILE)
-from uc3m_money.data.transfer_request import TransferRequest
-from uc3m_money.data.account_deposit import AccountDeposit
-from uc3m_money.attribute import IBAN, DEPOSIT  # Nuevas clases
+from uc3m_money.transfer_request import TransferRequest
+from uc3m_money.account_deposit import AccountDeposit
+from uc3m_money.attribute.amount_code import DEPOSIT
+from uc3m_money.attribute.iban_balance import IbanBalance
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
-
     def __init__(self):
         pass
 
-    def transfer_request(self, from_iban: str, to_iban: str, concept: str,
-                         transfer_type: str, date: str,amount: float)->str:
+    #pylint: disable=too-many-arguments
+    def transfer_request(self, from_iban: str,
+                         to_iban: str,
+                         concept: str,
+                         transfer_type: str,
+                         date: str,
+                         amount: float)->str:
         """first method: receives transfer info and
         stores it into a file"""
+
 
         my_request = TransferRequest(from_iban=from_iban,
                                      to_iban=to_iban,
@@ -42,19 +51,19 @@ class AccountManager:
         self.write_input_file(TRANSFERS_STORE_FILE, transfer_list)
         return my_request.transfer_code
 
+
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""
-        deposit_file = self.read_input_file(input_file, raise_if_missing= True)
+        deposit_file = self.read_input_file(input_file, raise_if_missing=True)
+        # comprobar valores del fichero
         try:
             deposit_iban = deposit_file["IBAN"]
             deposit_amount = deposit_file["AMOUNT"]
         except KeyError as e:
             raise AccountManagementException("Error - Invalid Key in JSON") from e
 
-        IBAN(deposit_iban)
-        DEPOSIT(deposit_amount)
-        # comprobar valores del fichero
-        deposit_obj = AccountDeposit(deposit_iban, deposit_amount)  # quitadas especif innecesarias
+        deposit_obj = AccountDeposit(to_iban=deposit_iban,
+                                     deposit_amount=deposit_amount)
 
         deposit_list = self.read_input_file(DEPOSITS_STORE_FILE)
         deposit_list.append(deposit_obj.to_json())
@@ -64,29 +73,14 @@ class AccountManager:
 
     def calculate_balance(self, iban:str)->bool:
         """calculate the balance for a given iban"""
-        IBAN(iban)
-        transactions_list = self.read_input_file(TRANSACTIONS_STORE_FILE, raise_if_missing=True)
-        iban_found = False
-        total_balance = 0
-        for transaction in transactions_list:
-            #print(transaction["IBAN"] + " - " + iban)
-            if transaction["IBAN"] == iban:
-                total_balance += float(transaction["amount"])
-                iban_found = True
-        if not iban_found:
-            raise AccountManagementException("IBAN not found")
-
-        last_balance = {"IBAN": iban,
-                        "time": datetime.timestamp(datetime.now(timezone.utc)),
-                        "BALANCE": total_balance}
-
+        total_balance = IbanBalance(iban)
         balance_list = self.read_input_file(BALANCES_STORE_FILE)
-        balance_list.append(last_balance)
+        balance_list.append(total_balance.to_json())
         self.write_input_file(BALANCES_STORE_FILE, balance_list)
         return True
 
     @staticmethod
-    def read_input_file(input_file, raise_if_missing: bool = False) -> list :
+    def read_input_file(input_file, raise_if_missing: bool = False) -> list:
         """Lee un archivo JSON y devuelve su contenido como lista.
         Si el archivo no existe, devuelve una lista vacía."""
         try:
@@ -109,3 +103,5 @@ class AccountManager:
                 json.dump(data, file, indent=2)
         except (OSError, json.JSONDecodeError) as ex:
             raise AccountManagementException("Wrong file or file path or JSON decode error") from ex
+
+

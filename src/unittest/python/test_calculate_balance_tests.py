@@ -75,45 +75,35 @@ class TestCalculateBalance(TestCase):
 
     def test_file_not_found(self):
         """path with transactions file not found"""
-        # Renombrar el archivo de transacciones para simular que no existe
-        self.rename_file(TRANSACTIONS_STORE_FILE, NOMBRE_FICHERO_TEMPORAL)
+        # rename the manipulated order's store
+        self.rename_file(TRANSACTIONS_STORE_FILE,NOMBRE_FICHERO_TEMPORAL )
         mngr = AccountManager()
         res = False
         msg = ""
-
-        # Comprobar si el archivo de balances existe antes de la ejecución
         if os.path.isfile(BALANCES_STORE_FILE):
             with open(BALANCES_STORE_FILE, "r", encoding="utf-8", newline="") as file_org:
-                hash_original = hashlib.md5(file_org.read().encode()).hexdigest()
+                hash_original = hashlib.md5(str(file_org).encode()).hexdigest()
         else:
             hash_original = ""
 
         try:
-            # Intentar calcular el balance con un IBAN válido
             mngr.calculate_balance(iban="ES3559005439021242088295")
         except AccountManagementException as ex:
-            # Verificar si la excepción lanzada es la esperada
-            if ex.message == "Wrong file or file path":
+            if ex.message == "Wrong file  or file path":
                 res = True
             else:
-                msg = f"Unexpected error message: {ex.message}"
-        except Exception as ex:
-            msg = f"Unexpected exception: {str(ex)}"
+                msg = ex.message
+        except Exception as  ex:
+            msg = str(ex)
 
-        # Restaurar el archivo de transacciones al final del test
-        self.rename_file(NOMBRE_FICHERO_TEMPORAL, TRANSACTIONS_STORE_FILE)
+        self.rename_file(NOMBRE_FICHERO_TEMPORAL,TRANSACTIONS_STORE_FILE)
+        self.assertEqual(True,res,msg)
 
-        # Verificar si el archivo de balances se mantiene igual
         if os.path.isfile(BALANCES_STORE_FILE):
             with open(BALANCES_STORE_FILE, "r", encoding="utf-8", newline="") as file:
-                hash_new = hashlib.md5(file.read().encode()).hexdigest()
+                hash_new = hashlib.md5(str(file).encode()).hexdigest()
         else:
             hash_new = ""
-
-        # Asegurarse de que la excepción haya sido lanzada correctamente
-        self.assertEqual(True, res, msg)
-
-        # Verificar que el archivo de balances no haya cambiado
         self.assertEqual(hash_new, hash_original)
 
     def test_file_not_json(self):
