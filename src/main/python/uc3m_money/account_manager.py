@@ -1,18 +1,14 @@
 """Account manager module """
-import re
 import os
 import json
-from datetime import datetime, timezone
 from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
                                         DEPOSITS_STORE_FILE,
-                                        TRANSACTIONS_STORE_FILE,
-                                        BALANCES_STORE_FILE)
+                                                  BALANCES_STORE_FILE)
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
-from uc3m_money.attribute.amount_code import DEPOSIT
-from uc3m_money.attribute.iban_balance import IbanBalance
+from uc3m_money.data.attribute.iban_balance import IbanBalance
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""

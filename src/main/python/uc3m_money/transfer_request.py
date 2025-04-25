@@ -2,11 +2,11 @@
 import hashlib
 import json
 from datetime import datetime, timezone
-from uc3m_money.attribute.concept_code import CONCEPT
-from uc3m_money.attribute.date_code import DATE
-from uc3m_money.attribute.iban_code import IBAN
-from uc3m_money.attribute.transfer_code import TRANSFER
-from uc3m_money.attribute.format_code import FORMAT
+from uc3m_money.data.attribute.concept_code import CONCEPT
+from uc3m_money.data.attribute.date_code import DATE
+from uc3m_money.data.attribute.iban_code import IBAN
+from uc3m_money.data.attribute.transfer_code import TRANSFER
+from uc3m_money.data.attribute.format_code import FORMAT
 
 class TransferRequest:
     """Class representing a transfer request"""

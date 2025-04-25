@@ -1,6 +1,6 @@
 """docstring"""
 from uc3m_money.data.attribute.attribute import Attribute
-from uc3m_money.exception.account_management_exception import AccountManagementException
+from uc3m_money.account_management_exception import AccountManagementException
 
 
 class IBAN(Attribute):
@@ -14,26 +14,39 @@ class IBAN(Attribute):
     def _validate(self, value: str) -> str:
         """Method for validating an IBAN including control digit check"""
         # Primero validar el formato básico con el patrón regex
-        super()._validate(value)
-        # Validación del dígito de control
-        original_code = value[2:4]
-        # Reemplazar el código de control por 00 para el cálculo
-        value = value[:2] + "00" + value[4:]
-        # Mover los primeros 4 caracteres al final
-        value = value[4:] + value[:4]
-        # Crear tabla de traducción de letras a números
-        translation_table = str.maketrans({
-            'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15',
-            'G': '16', 'H': '17', 'I': '18', 'J': '19', 'K': '20', 'L': '21',
-            'M': '22', 'N': '23', 'O': '24', 'P': '25', 'Q': '26', 'R': '27',
-            'S': '28', 'T': '29', 'U': '30', 'V': '31', 'W': '32', 'X': '33',
-            'Y': '34', 'Z': '35'
-        })
-        # Aplicar traducción
-        iban_numeric = value.translate(translation_table)
-        # Calcular dígito de control (98 - (mod 97))
-        calculated_code = 98 - (int(iban_numeric) % 97)
-        # Comprobar que coincide con el código original
-        if int(original_code) != calculated_code:
+        iban = super()._validate(value)
+        original_code = iban[2:4]
+        # replacing the control
+        iban = iban[:2] + "00" + iban[4:]
+        iban = iban[4:] + iban[:4]
+
+        # Convertir el IBAN en una cadena numérica, reemplazando letras por números
+        iban = (iban.replace('A', '10').replace('B', '11').
+                replace('C', '12').replace('D', '13').replace('E', '14').
+                replace('F', '15'))
+        iban = (iban.replace('G', '16').replace('H', '17').
+                replace('I', '18').replace('J', '19').replace('K', '20').
+                replace('L', '21'))
+        iban = (iban.replace('M', '22').replace('N', '23').
+                replace('O', '24').replace('P', '25').replace('Q', '26').
+                replace('R', '27'))
+        iban = (iban.replace('S', '28').replace('T', '29').replace('U', '30').
+                replace('V', '31').replace('W', '32').replace('X', '33'))
+        iban = iban.replace('Y', '34').replace('Z', '35')
+
+        # Mover los cuatro primeros caracteres al final
+
+        # Convertir la cadena en un número entero
+        int_i = int(iban)
+
+        # Calcular el módulo 97
+        mod = int_i % 97
+
+        # Calcular el dígito de control (97 menos el módulo)
+        dc = 98 - mod
+
+        if int(original_code) != dc:
+            # print(dc)
             raise AccountManagementException("Invalid IBAN control digit")
+
         return value

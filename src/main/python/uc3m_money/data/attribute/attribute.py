@@ -1,6 +1,6 @@
 """docstring"""
 import re
-from uc3m_money.exception.account_management_exception import AccountManagementException
+from uc3m_money.account_management_exception import AccountManagementException
 
 
 class Attribute:

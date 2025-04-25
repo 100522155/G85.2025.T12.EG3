@@ -1,4 +1,4 @@
-from .attribute import Attribute
+from uc3m_money.data.attribute.attribute import Attribute
 
 class FORMAT(Attribute):
     def __init__(self, attr_value):

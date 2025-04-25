@@ -1,8 +1,8 @@
 """Contains the class OrderShipping"""
 from datetime import datetime, timezone
 import hashlib
-from uc3m_money.attribute.iban_code import IBAN
-from uc3m_money.attribute.amount_code import DEPOSIT
+from uc3m_money.data.attribute.iban_code import IBAN
+from uc3m_money.data.attribute.amount_code import DEPOSIT
 
 class AccountDeposit():
     """Class representing the information required for shipping of an order"""

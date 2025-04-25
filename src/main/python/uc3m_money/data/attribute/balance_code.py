@@ -1,5 +1,5 @@
-from .attribute import Attribute
-from uc3m_money.exception.account_management_exception import AccountManagementException
+from uc3m_money.data.attribute.attribute import Attribute
+from uc3m_money.account_management_exception import AccountManagementException
 
 class BALANCE(Attribute):
     def _validate(self, iban: str, transactions_list ):

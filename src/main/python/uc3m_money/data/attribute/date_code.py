@@ -1,7 +1,7 @@
 """docstring"""
 from datetime import datetime, timezone
-from .attribute import Attribute
-from uc3m_money.exception.account_management_exception import AccountManagementException
+from uc3m_money.data.attribute.attribute import Attribute
+from uc3m_money.account_management_exception import AccountManagementException
 
 
 class DATE(Attribute):
@@ -14,7 +14,7 @@ class DATE(Attribute):
 
 
     def _validate(self, value):
-        super()._validate(value)
+        value = super()._validate(value)
         try:
             my_date = datetime.strptime(value, "%d/%m/%Y").date()
             if not (2025 <= my_date.year <= 2050):
@@ -23,3 +23,4 @@ class DATE(Attribute):
                 raise AccountManagementException("Transfer date must be today or later.")
         except ValueError:
             raise AccountManagementException("Invalid date format")
+        return value
