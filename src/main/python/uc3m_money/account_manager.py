@@ -54,8 +54,7 @@ class AccountManager:
         IBAN(deposit_iban)
         DEPOSIT(deposit_amount)
         # comprobar valores del fichero
-
-        deposit_obj = AccountDeposit(deposit_iban,deposit_amount) # quitadas especif innecesarias
+        deposit_obj = AccountDeposit(deposit_iban, deposit_amount)  # quitadas especif innecesarias
 
         deposit_list = self.read_input_file(DEPOSITS_STORE_FILE)
         deposit_list.append(deposit_obj.to_json())
@@ -110,4 +109,3 @@ class AccountManager:
                 json.dump(data, file, indent=2)
         except (OSError, json.JSONDecodeError) as ex:
             raise AccountManagementException("Wrong file or file path or JSON decode error") from ex
-

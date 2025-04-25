@@ -9,19 +9,23 @@ class TransferRequest:
     #pylint: disable=too-many-arguments
     def __init__(self,
                  from_iban: str,
-                 transfer_type: str,
                  to_iban:str,
                  transfer_concept:str,
+                 transfer_type: str,
                  transfer_date:str,
                  transfer_amount:float):
-        self.__from_iban = IBAN(from_iban).value
-        self.__to_iban = IBAN(to_iban).value
-        self.__transfer_type = FORMAT(transfer_type).value
-        self.__concept = CONCEPT(transfer_concept).value
-        self.__transfer_date = DATE(transfer_date).value
-        self.__transfer_amount = TRANSFER(transfer_amount).value
+
+        self.__from_iban = IBAN(from_iban).value  # Quinto
+        self.__to_iban = IBAN(to_iban).value  # Sexto
         justnow = datetime.now(timezone.utc)
         self.__time_stamp = datetime.timestamp(justnow)
+        self.__concept = CONCEPT(transfer_concept).value  # Segundo
+        self.__transfer_type = FORMAT(transfer_type).value  # Cuarto
+        self.__transfer_date = DATE(transfer_date).value  # Tercero
+        self.__transfer_amount = TRANSFER(transfer_amount).value  # Primero
+
+
+
 
 
     def __str__(self):
@@ -32,10 +36,10 @@ class TransferRequest:
         return {
             "from_iban": self.__from_iban,
             "to_iban": self.__to_iban,
-            "transfer_type": self.__transfer_type,
-            "transfer_amount": self.__transfer_amount,
             "transfer_concept": self.__concept,
+            "transfer_type": self.__transfer_type,
             "transfer_date": self.__transfer_date,
+            "transfer_amount": self.__transfer_amount,
             "time_stamp": self.__time_stamp,
             "transfer_code": self.transfer_code
         }
@@ -58,6 +62,15 @@ class TransferRequest:
         self.__to_iban = value
 
     @property
+    def transfer_concept(self):
+        """Property representing the transfer concept"""
+        return self.__concept
+
+    @transfer_concept.setter
+    def transfer_concept(self, value):
+        self.__concept = value
+
+    @property
     def transfer_type(self):
         """Property representing the type of transfer: REGULAR, INMEDIATE or URGENT """
         return self.__transfer_type
@@ -66,28 +79,21 @@ class TransferRequest:
         self.__transfer_type = value
 
     @property
-    def transfer_amount(self):
-        """Property respresenting the transfer amount"""
-        return self.__transfer_amount
-    @transfer_amount.setter
-    def transfer_amount(self, value):
-        self.__transfer_amount = value
-
-    @property
-    def transfer_concept(self):
-        """Property representing the transfer concept"""
-        return self.__concept
-    @transfer_concept.setter
-    def transfer_concept(self, value):
-        self.__concept = value
-
-    @property
     def transfer_date( self ):
         """Property representing the transfer's date"""
         return self.__transfer_date
     @transfer_date.setter
     def transfer_date( self, value ):
         self.__transfer_date = value
+
+    @property
+    def transfer_amount(self):
+        """Property respresenting the transfer amount"""
+        return self.__transfer_amount
+
+    @transfer_amount.setter
+    def transfer_amount(self, value):
+        self.__transfer_amount = value
 
     @property
     def time_stamp(self):
