@@ -7,6 +7,7 @@ from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
 from uc3m_money.data.attribute.iban_balance import IbanBalance
 from uc3m_money.storage.transfers_json_store import TransfersJsonStore
+from uc3m_money.storage.deposits_json_store import DepositsJsonStore
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
@@ -40,8 +41,6 @@ class AccountManager:
 
         deposits_json_store = DepositsJsonStore()
         deposits_json_store.add_item(deposit_obj)
-        return deposit_obj.deposit_signature
-
         return deposit_obj.deposit_signature
 
     def calculate_balance(self, iban:str)->bool:
