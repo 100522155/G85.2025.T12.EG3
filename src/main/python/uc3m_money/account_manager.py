@@ -38,9 +38,9 @@ class AccountManager:
         deposit_obj = AccountDeposit(to_iban=deposit_iban,
                                      deposit_amount=deposit_amount)
 
-        deposit_list = self.read_input_file(DEPOSITS_STORE_FILE)
-        deposit_list.append(deposit_obj.to_json())
-        self.write_input_file(DEPOSITS_STORE_FILE, deposit_list)
+        deposits_json_store = DepositsJsonStore()
+        deposits_json_store.add_item(deposit_obj)
+        return deposit_obj.deposit_signature
 
         return deposit_obj.deposit_signature
 
