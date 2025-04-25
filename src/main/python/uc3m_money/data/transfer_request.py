@@ -2,8 +2,11 @@
 import hashlib
 import json
 from datetime import datetime, timezone
-from uc3m_money.attribute import IBAN, CONCEPT, DATE, FORMAT, TRANSFER, DEPOSIT  # Nuevas clases
-
+from uc3m_money.data.attribute.format_code import FORMAT # Nuevas clases
+from uc3m_money.data.attribute.iban_code import IBAN
+from uc3m_money.data.attribute.concept_code import CONCEPT
+from uc3m_money.data.attribute.date_code import DATE
+from uc3m_money.data.attribute.transfer_code import TRANSFER
 class TransferRequest:
     """Class representing a transfer request"""
     #pylint: disable=too-many-arguments
@@ -17,14 +20,12 @@ class TransferRequest:
 
         self.__from_iban = IBAN(from_iban).value  # Quinto
         self.__to_iban = IBAN(to_iban).value  # Sexto
-        justnow = datetime.now(timezone.utc)
-        self.__time_stamp = datetime.timestamp(justnow)
         self.__concept = CONCEPT(transfer_concept).value  # Segundo
         self.__transfer_type = FORMAT(transfer_type).value  # Cuarto
         self.__transfer_date = DATE(transfer_date).value  # Tercero
         self.__transfer_amount = TRANSFER(transfer_amount).value  # Primero
-
-
+        justnow = datetime.now(timezone.utc)
+        self.__time_stamp = datetime.timestamp(justnow)
 
 
 
@@ -104,6 +105,3 @@ class TransferRequest:
     def transfer_code(self):
         """Returns the md5 signature (transfer code)"""
         return hashlib.md5(str(self).encode()).hexdigest()
-
-
-
