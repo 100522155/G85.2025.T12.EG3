@@ -9,6 +9,7 @@ from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
 from uc3m_money.data.attribute.iban_balance import IbanBalance
+from uc3m_money.storage.transfers_json_store import TransfersJsonStore
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
@@ -33,20 +34,10 @@ class AccountManager:
                                      transfer_date=date,
                                      transfer_amount=amount)
 
-        transfer_list = self.read_input_file(TRANSFERS_STORE_FILE)
-        for transfer_item in transfer_list:
-            if (transfer_item["from_iban"] == my_request.from_iban and
-                    transfer_item["to_iban"] == my_request.to_iban and
-                    transfer_item["transfer_date"] == my_request.transfer_date and
-                    transfer_item["transfer_amount"] == my_request.transfer_amount and
-                    transfer_item["transfer_concept"] == my_request.transfer_concept and
-                    transfer_item["transfer_type"] == my_request.transfer_type):
-                raise AccountManagementException("Duplicated transfer in transfer list")
 
-        transfer_list.append(my_request.to_json())
-        self.write_input_file(TRANSFERS_STORE_FILE, transfer_list)
+        transfer_store = TransfersJsonStore()
+        transfer_store.add_item(my_request)
         return my_request.transfer_code
-
 
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""

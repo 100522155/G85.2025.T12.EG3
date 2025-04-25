@@ -1,6 +1,6 @@
 """JsonStore definition"""
 import json
-from uc3m_money import AccountManagementException
+from uc3m_money.account_management_exception import AccountManagementException
 
 
 """"""
@@ -35,5 +35,5 @@ class JsonStore():
     def add_item(self, item):
         """add a new item in the store"""
         self.load_list_from_file()
-        self._data_list.append(item.to_json)
+        self._data_list.append(item.to_json())
         self.save_list_to_file()

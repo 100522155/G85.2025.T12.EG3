@@ -1,7 +1,7 @@
 """transfers_json_store"""
-from uc3m_money import AccountManagementException
+from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.storage.json_store import JsonStore
-from uc3m_money.config.account_management_config import TRANSFERS_STORE_FILE
+from uc3m_money.account_management_config import TRANSFERS_STORE_FILE
 
 
 class TransfersJsonStore(JsonStore):
@@ -13,6 +13,7 @@ class TransfersJsonStore(JsonStore):
             if (transfer == item.to_json()):
                 raise AccountManagementException("Duplicated transfer in transfer list")
         super().add_item(item)
+
 
 
 """
