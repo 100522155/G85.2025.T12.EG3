@@ -2,10 +2,7 @@
 import os
 import json
 from uc3m_money.account_management_exception import AccountManagementException
-from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
-                                        DEPOSITS_STORE_FILE,
-                                                  BALANCES_STORE_FILE)
-
+from uc3m_money.account_management_config import (DEPOSITS_STORE_FILE, BALANCES_STORE_FILE)
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
 from uc3m_money.data.attribute.iban_balance import IbanBalance
@@ -17,23 +14,13 @@ class AccountManager:
         pass
 
     #pylint: disable=too-many-arguments
-    def transfer_request(self, from_iban: str,
-                         to_iban: str,
-                         concept: str,
-                         transfer_type: str,
-                         date: str,
-                         amount: float)->str:
+    def transfer_request(self, from_iban: str,to_iban: str,concept: str,
+                         transfer_type: str,date: str,amount: float)->str:
         """first method: receives transfer info and
         stores it into a file"""
-
-
-        my_request = TransferRequest(from_iban=from_iban,
-                                     to_iban=to_iban,
-                                     transfer_concept=concept,
-                                     transfer_type=transfer_type,
-                                     transfer_date=date,
-                                     transfer_amount=amount)
-
+        my_request = TransferRequest(from_iban=from_iban,to_iban=to_iban,
+                                     transfer_concept=concept,transfer_type=transfer_type,
+                                     transfer_date=date,transfer_amount=amount)
 
         transfer_store = TransfersJsonStore()
         transfer_store.add_item(my_request)
@@ -42,7 +29,6 @@ class AccountManager:
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""
         deposit_file = self.read_input_file(input_file, raise_if_missing=True)
-        # comprobar valores del fichero
         try:
             deposit_iban = deposit_file["IBAN"]
             deposit_amount = deposit_file["AMOUNT"]
@@ -90,5 +76,3 @@ class AccountManager:
                 json.dump(data, file, indent=2)
         except (OSError, json.JSONDecodeError) as ex:
             raise AccountManagementException("Wrong file or file path or JSON decode error") from ex
-
-
